@@ -37,7 +37,7 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (password.length < 6) { toast.error("Password must be at least 6 characters."); return; }
     setBusy(true);
     const { data, error } = mode === "in"
       ? await supabase.auth.signInWithPassword({ email, password })
