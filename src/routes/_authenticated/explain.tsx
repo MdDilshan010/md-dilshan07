@@ -11,9 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { explainCode } from "@/lib/explain.functions";
 import { LANGUAGES, DIFFICULTIES, defaultSettings, MAX_CODE_CHARS, type ExplainSettings } from "@/lib/explain-options";
 import { SAMPLES } from "@/lib/samples";
+import { ExplanationFollowups } from "@/components/ExplanationFollowups";
 
 export const Route = createFileRoute("/_authenticated/explain")({
-  head: () => ({ meta: [{ title: "Explain Code — AI Code Explainer" }, { name: "description", content: "Get a line-by-line explanation of your code." }] }),
+  head: () => ({ meta: [{ title: "Explain Code — AI Code Explainer" }, { name: "description", content: "Get a line-by-line explanation of your code." }, { property: "og:title", content: "Explain Code — AI Code Explainer" }, { property: "og:description", content: "Understand code and ask follow-up questions about saved explanations." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ExplainPage,
 });
 
@@ -23,13 +24,14 @@ function ExplainPage() {
   const [difficulty, setDifficulty] = useState<(typeof DIFFICULTIES)[number]>("beginner");
   const [settings, setSettings] = useState<ExplainSettings>(defaultSettings);
   const [out, setOut] = useState("");
+  const [savedId, setSavedId] = useState("");
   const [busy, setBusy] = useState(false);
   const run = useServerFn(explainCode);
   const qc = useQueryClient();
 
   useEffect(() => {
     const r = sessionStorage.getItem("reuse");
-    if (r) { const e = JSON.parse(r); setCode(e.code); setOut(e.explanation ?? ""); sessionStorage.removeItem("reuse"); }
+    if (r) { try { const e = JSON.parse(r); setCode(e.code); setOut(e.explanation ?? ""); setSavedId(e.id ?? ""); } catch { toast.error("Could not open this explanation."); } sessionStorage.removeItem("reuse"); }
   }, []);
 
   async function go() {
@@ -39,7 +41,7 @@ function ExplainPage() {
     try {
       const r = await run({ data: { code, language, difficulty, settings } });
       if (!r.ok) toast.error(r.error);
-      else { setOut(r.explanation); toast.success(r.saved ? "Explanation saved to history" : "Explained (not saved)"); qc.invalidateQueries({ queryKey: ["history"] }); }
+      else { setOut(r.explanation); setSavedId(r.saved ? r.id : ""); toast.success(r.saved ? "Explanation saved to history" : "Explained (not saved)"); qc.invalidateQueries({ queryKey: ["history"] }); }
     } catch { toast.error("Request failed. Check your connection."); }
     setBusy(false);
   }
@@ -81,6 +83,7 @@ function ExplainPage() {
         <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold">AI Explanation</h2>
           {out && <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(out); toast.success("Copied"); }}><Copy />Copy</Button>}</div>
         {busy ? <p className="text-muted-foreground">Gemini is explaining your code…</p> : out ? <div className="prose-explain"><ReactMarkdown remarkPlugins={[remarkGfm]}>{out}</ReactMarkdown></div> : <p className="text-muted-foreground">Your explanation will appear here.</p>}
+        {!busy && savedId && out && <ExplanationFollowups key={savedId} explanationId={savedId} />}
       </section>
     </div>
   );

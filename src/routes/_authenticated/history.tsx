@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchHistory, type Entry } from "@/lib/history";
 
 export const Route = createFileRoute("/_authenticated/history")({
-  head: () => ({ meta: [{ title: "History — AI Code Explainer" }, { name: "description", content: "Your saved code explanations." }] }),
+  head: () => ({ meta: [{ title: "History — AI Code Explainer" }, { name: "description", content: "Your saved code explanations." }, { property: "og:title", content: "History — AI Code Explainer" }, { property: "og:description", content: "Revisit your saved code explanations and follow-up answers." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: HistoryPage,
 });
 
@@ -23,7 +23,8 @@ function HistoryPage() {
   async function del(id?: string) {
     if (!confirm(id ? "Delete this entry?" : "Clear all history?")) return;
     const { data: u } = await supabase.auth.getUser();
-    const r = id ? await supabase.from("explanations").delete().eq("id", id) : await supabase.from("explanations").delete().eq("user_id", u.user!.id);
+    if (!u.user) { toast.error("Please sign in again."); return; }
+    const r = id ? await supabase.from("explanations").delete().eq("id", id) : await supabase.from("explanations").delete().eq("user_id", u.user.id);
     if (r.error) toast.error(r.error.message); else { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["history"] }); }
   }
   const open = (e: Entry) => { sessionStorage.setItem("reuse", JSON.stringify(e)); nav({ to: "/explain" }); };
