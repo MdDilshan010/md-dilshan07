@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_gateway_access_blocks: {
+        Row: {
+          created_at: string
+          message: string
+          status: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message: string
+          status: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message?: string
+          status?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      explanation_followups: {
+        Row: {
+          answer: string
+          created_at: string
+          explanation_id: string
+          id: string
+          model_history: Json
+          question: string
+          run_id: string | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          explanation_id: string
+          id?: string
+          model_history?: Json
+          question: string
+          run_id?: string | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          explanation_id?: string
+          id?: string
+          model_history?: Json
+          question?: string
+          run_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explanation_followups_explanation_id_fkey"
+            columns: ["explanation_id"]
+            isOneToOne: false
+            referencedRelation: "explanations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       explanations: {
         Row: {
           code: string

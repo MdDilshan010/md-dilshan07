@@ -1,0 +1,13 @@
+CREATE TABLE public.explanation_followups (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), explanation_id uuid NOT NULL REFERENCES public.explanations(id) ON DELETE CASCADE, user_id uuid NOT NULL, question text NOT NULL, answer text NOT NULL, model_history jsonb NOT NULL DEFAULT '[]'::jsonb, run_id text, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT ON public.explanation_followups TO authenticated;
+GRANT ALL ON public.explanation_followups TO service_role;
+ALTER TABLE public.explanation_followups ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Read own followups" ON public.explanation_followups FOR SELECT TO authenticated USING (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.explanations e WHERE e.id = explanation_id AND e.user_id = auth.uid()));
+CREATE POLICY "Save own followups" ON public.explanation_followups FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.explanations e WHERE e.id = explanation_id AND e.user_id = auth.uid()));
+CREATE INDEX explanation_followups_parent_created ON public.explanation_followups(explanation_id, created_at);
+CREATE TABLE public.ai_gateway_access_blocks (user_id uuid PRIMARY KEY, message text NOT NULL, status integer NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT ON public.ai_gateway_access_blocks TO authenticated;
+GRANT ALL ON public.ai_gateway_access_blocks TO service_role;
+ALTER TABLE public.ai_gateway_access_blocks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Read own AI access block" ON public.ai_gateway_access_blocks FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "Record own AI access block" ON public.ai_gateway_access_blocks FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
