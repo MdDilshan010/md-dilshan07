@@ -43,7 +43,7 @@ export async function handleFollowup(request: Request): Promise<Response> {
   correlated.delete("X-Lovable-AIG-Run-ID");
   if (priorRun) correlated.set("X-Lovable-AIG-Run-ID", priorRun);
   let upstreamError: { message: string; status: number } | undefined;
-  const call = createResponsesCall(new Request(request, { headers: correlated }), {
+  const call = createResponsesCall(new Request(request.url, { headers: correlated, signal: request.signal }), {
     baseURL: "https://ai.gateway.lovable.dev/v1", apiKey, model: "openai/gpt-6-astra",
     onResponse: async (response) => {
       if (response.ok) return;

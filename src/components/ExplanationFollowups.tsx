@@ -39,7 +39,7 @@ export function ExplanationFollowups({ explanationId }: { explanationId: string 
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` },
         body: JSON.stringify({ explanationId, question: q }), signal: controller.signal,
       });
-      if (!response.ok) { const result = await response.json(); throw new Error(result.error ?? "Could not answer this question."); }
+      if (!response.ok) { const result = await response.json().catch(() => null); throw new Error(result?.error ?? "Could not answer this question. Please try again."); }
       if (!response.body) throw new Error("No answer received.");
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
       const consume = (line: string) => {
