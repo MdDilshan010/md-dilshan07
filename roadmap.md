@@ -1,0 +1,3 @@
+- [ ] Add private follow-up questions and AI Gateway answers for saved explanations.
+- [ ] Verify Gemini explanation generation and history saving.
+- [ ] Test follow-up answers, access checks, and saved conversation loading.
