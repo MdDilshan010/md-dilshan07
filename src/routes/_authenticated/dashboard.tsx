@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { fetchHistory } from "@/lib/history";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — AI Code Explainer" }, { name: "description", content: "Your code explanation dashboard." }] }),
+  head: () => ({ meta: [{ title: "Dashboard — AI Code Explainer" }, { name: "description", content: "Your code explanation dashboard." }, { property: "og:title", content: "Dashboard — AI Code Explainer" }, { property: "og:description", content: "Your learning progress and recent code explanations." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: Dashboard,
 });
 
