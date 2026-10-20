@@ -72,7 +72,7 @@ function ExplainPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-4">
             {(["examples", "complexity", "improvements", "sampleIO"] as const).map((k) => (
-              <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={settings[k]} onChange={(e) => set(k, e.target.checked)} />{k === "sampleIO" ? "Sample I/O" : k[0].toUpperCase() + k.slice(1)}</label>
+              <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={settings[k]} onChange={(e) => set(k, e.target.checked)} />{k === "sampleIO" ? "Sample I/O" : k.charAt(0).toUpperCase() + k.slice(1)}</label>
             ))}
           </div>
           <Textarea className="mt-3" maxLength={500} placeholder="Custom instructions (optional)" value={settings.customInstructions} onChange={(e) => set("customInstructions", e.target.value)} />

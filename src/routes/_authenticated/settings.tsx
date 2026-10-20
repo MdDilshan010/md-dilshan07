@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/AppShell";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — AI Code Explainer" }, { name: "description", content: "App settings." }] }),
+  head: () => ({ meta: [{ title: "Settings — AI Code Explainer" }, { name: "description", content: "Choose your AI Code Explainer display preferences." }, { property: "og:title", content: "Settings — AI Code Explainer" }, { property: "og:description", content: "Choose your AI Code Explainer display preferences." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: SettingsPage,
 });
 

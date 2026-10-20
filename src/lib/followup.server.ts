@@ -81,7 +81,7 @@ export async function handleFollowup(request: Request): Promise<Response> {
         if (!failed && !request.signal.aborted) {
           if (!answer.trim()) emit({ type: "error", error: "AI declined or returned no answer." });
           else {
-            const { error } = await db.from("explanation_followups").insert({ explanation_id: explanationId, user_id: userId, question, answer, run_id: call.gateway.getRunId() });
+            const { error } = await db.from("explanation_followups").insert({ explanation_id: explanationId, user_id: userId, question, answer, run_id: call.gateway.getRunId() ?? null });
             if (error) emit({ type: "error", error: "Answer received, but could not save this question." });
             else emit({ type: "done" });
           }
