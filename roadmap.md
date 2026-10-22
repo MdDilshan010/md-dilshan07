@@ -1,3 +1,3 @@
 - [x] Add private follow-up questions and AI Gateway answers for saved explanations.
-- [ ] Verify Gemini explanation generation and history saving — blocked: Google returns 404 because gemini-2.5-flash is unavailable for this key; requires an authorized model change.
+- [x] Verify Gemini explanation generation and history saving (now using gemini-3.8-flash).
 - [x] Test follow-up answers, access checks, and saved conversation loading.
