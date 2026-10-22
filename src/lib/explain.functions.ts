@@ -13,7 +13,8 @@ export const explainCode = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<Result> => {
     const apiKey = process.env["GEMINI_API_KEY"];
     if (!apiKey) return { ok: false, error: "The Gemini API key is not configured yet. Add GEMINI_API_KEY in the project's secrets." };
-    const model = process.env["GEMINI_MODEL"] || "gemini-2.5-flash";
+    // Verified via Google's models.list + generateContent for this key (gemini-2.5-flash is retired for new users).
+    const model = process.env["GEMINI_MODEL"] || "gemini-3.8-flash";
 
     // Basic abuse protection: max 8 explanations per user per minute.
     const since = new Date(Date.now() - 60_000).toISOString();
@@ -54,11 +55,15 @@ export const explainCode = createServerFn({ method: "POST" })
     }
 
     const json = (await res.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+      candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
       promptFeedback?: { blockReason?: string };
     };
     if (json.promptFeedback?.blockReason) return { ok: false, error: "Gemini declined to explain this code." };
-    const explanation = (json.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("").trim();
+    const explanation = (json.candidates?.[0]?.content?.parts ?? [])
+      .filter((p) => !p.thought)
+      .map((p) => p.text ?? "")
+      .join("")
+      .trim();
     if (explanation.length < 40) return { ok: false, error: "Gemini returned an empty or unusable answer. Please try again." };
 
     const { data: row, error } = await context.supabase
